@@ -20,24 +20,32 @@
           - https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ fedora_version }}.noarch.rpm
           - gnome-tweaks
           - gnome-extensions-app
+          - snapd
           - vlc
           - transmission
           - geary
+          - chromium
 
     # Using shell command as workaround because there is no Ansible plugin for dnf config-manageer.
     # https://github.com/ansible/ansible/issues/46963
     - name: Add Docker remote repository to dnf.
       command: dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
 
-    # There may be a better way to accomplish the VS Code stuff than using shell commands.
-    # TODO: Install using Snap. Looks like the easiest option for installing Postman anyway.
-    - name: Add VS Code key.
-      command: rpm --import https://packages.microsoft.com/keys/microsoft.asc
+    - name: Create symlink to support snap classic.  # Needed to install VS Code.
+      command: ln -sf /var/lib/snapd/snap /snap
 
-    - name: Add VS Code remote repository.
-      command: sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
+    - name: Install VS Code.
+      community.general.snap:
+        name:
+          - code
+        classic: true
 
-    - name: Install development packages.
+    - name: Install Postman.
+      community.general.snap:
+        name:
+          - postman
+
+    - name: Install Docker.
       dnf:
         name: "{{ packages }}"
         state: latest
@@ -47,21 +55,3 @@
           - docker-ce-cli
           - containerd.io
           - docker-compose-plugin
-          - code
-
-          
-
-          
-
-    # - name: Add the flathub flatpak repository remote to the user installation.
-    #   community.general.flatpak_remote:
-    #     name: flathub
-    #     state: present
-    #     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
-    #     method: user
-
-    # - name: Install the Geary email client package from flathub for current user.
-    #   flatpak:
-    #     name: org.gnome.Geary
-    #     state: present
-    #     method: user
