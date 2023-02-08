@@ -1,6 +1,7 @@
 - hosts: localhost
   become: yes
   vars:
+    - user: e
     - fedora_version: 37
 
   tasks:
@@ -67,8 +68,10 @@
           - containerd.io
           - docker-compose-plugin
 
-    - name: Create symlink to support snap classic.  # Needed to install VS Code.
-      command: ln -sf /var/lib/snapd/snap /snap
+    - name: Enable snap classic mode.
+      shell: |
+        ln -sf /var/lib/snapd/snap /snap
+        . /home/{{ user }}/.bashrc
 
     - name: Install VS Code.
       community.general.snap:
@@ -82,8 +85,7 @@
           - core18
           - postman
 
-    # # This neither works nor throws an error, but the commands work when pasted into the terminal.
-    # # Easy enough to do it manually for now.
+    # # This neither works nor throws an error, but the commands work when pasted into the terminal. Easy enough to do it manually for now.
     # - name: Apply GNOME tweaks.
     #   shell: |
     #       gsettings set org.gnome.desktop.sound allow-volume-above-100-percent true
