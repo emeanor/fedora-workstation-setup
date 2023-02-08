@@ -41,10 +41,10 @@
         name: "{{ packages }}"
         state: latest
       vars:
-        packages:  # Chrome, Firefox...
+        packages:
           - dnf-plugins-core
           - gnome-tweaks
-          - gnome-extensions-app
+          # - gnome-extensions-app
           - snapd
           - vlc
           - transmission
@@ -55,6 +55,17 @@
     # https://github.com/ansible/ansible/issues/46963
     - name: Add Docker remote repository to dnf.
       command: dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+
+    - name: Install Docker.
+      dnf:
+        name: "{{ packages }}"
+        state: latest
+      vars:
+        packages:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
 
     - name: Create symlink to support snap classic.  # Needed to install VS Code.
       command: ln -sf /var/lib/snapd/snap /snap
@@ -71,13 +82,11 @@
           - core18
           - postman
 
-    - name: Install Docker.
-      dnf:
-        name: "{{ packages }}"
-        state: latest
-      vars:
-        packages:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-          - docker-compose-plugin
+    # # This neither works nor throws an error, but the commands work when pasted into the terminal.
+    # # Easy enough to do it manually for now.
+    # - name: Apply GNOME tweaks.
+    #   shell: |
+    #       gsettings set org.gnome.desktop.sound allow-volume-above-100-percent true
+    #       gsettings set org.gnome.desktop.interface clock-show-weekday true
+    #       gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:minimize,maximize,close'
+    #       gsettings set org.gnome.mutter attach-modal-dialogs false
