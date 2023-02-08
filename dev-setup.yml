@@ -1,13 +1,23 @@
 - hosts: localhost
   become: yes
   vars:
-    - fedora_version: 36
+    - fedora_version: 37
 
   tasks:
     - name: Update system packages.
       dnf:
         name: '*'
         state: latest
+
+    - name: Enable RPM Fusion repository.
+      dnf:
+        name: "{{ packages }}"
+        state: latest
+        disable_gpg_check: True
+      vars:
+        packages: 
+          - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ fedora_version }}.noarch.rpm
+          - https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ fedora_version }}.noarch.rpm
 
     - name: Install system packages.
       dnf:
@@ -16,8 +26,6 @@
       vars:
         packages:  # Chrome, Firefox...
           - dnf-plugins-core
-          - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ fedora_version }}.noarch.rpm
-          - https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ fedora_version }}.noarch.rpm
           - gnome-tweaks
           - gnome-extensions-app
           - snapd
@@ -43,6 +51,7 @@
     - name: Install Postman.
       community.general.snap:
         name:
+          - core18
           - postman
 
     - name: Install Docker.
