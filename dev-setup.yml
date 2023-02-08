@@ -4,6 +4,23 @@
     - fedora_version: 37
 
   tasks:
+    - name: Remove clutter.
+      dnf:
+        name: "{{ packages }}"
+        state: removed
+      vars:
+        packages:
+          - cheese
+          - libreoffice-calc
+          - libreoffice-impress
+          - gnome-contacts
+          - gnome-maps
+          - gnome-photos
+          - gnome-tour
+          - gnome-weather
+          - simple-scan
+          - totem
+
     - name: Update system packages.
       dnf:
         name: '*'
