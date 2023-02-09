@@ -31,11 +31,11 @@
     - name: Enable RPM Fusion repository.
       become: yes
       dnf:
-        name: "{{ packages }}"
+        name: "{{ downloads }}"
         state: latest
         disable_gpg_check: True
       vars:
-        packages: 
+        downloads: 
           - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ fedora_version }}.noarch.rpm
           - https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ fedora_version }}.noarch.rpm
 
@@ -60,7 +60,7 @@
         name: "{{ packages }}"
       vars:
         packages:
-          - psutil
+          - psutil  # Dependency for community.general.dconf.
 
     # Using shell command as workaround because there is no Ansible plugin for dnf config-manageer.
     # https://github.com/ansible/ansible/issues/46963
