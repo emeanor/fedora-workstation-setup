@@ -1,11 +1,11 @@
 - hosts: localhost
-  become: yes
   vars:
     - user: e
     - fedora_version: 37
 
   tasks:
     - name: Remove clutter.
+      become: yes
       dnf:
         name: "{{ packages }}"
         state: removed
@@ -23,11 +23,13 @@
           - totem
 
     - name: Update system packages.
+      become: yes
       dnf:
         name: '*'
         state: latest
 
     - name: Enable RPM Fusion repository.
+      become: yes
       dnf:
         name: "{{ packages }}"
         state: latest
@@ -38,26 +40,36 @@
           - https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ fedora_version }}.noarch.rpm
 
     - name: Install system packages.
+      become: yes
       dnf:
         name: "{{ packages }}"
         state: latest
       vars:
         packages:
           - dnf-plugins-core
+          - python3-pip
           - gnome-tweaks
-          # - gnome-extensions-app
           - snapd
           - vlc
           - transmission
           - geary
           - chromium
 
+    - name: Install Python packages.
+      ansible.builtin.pip:
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - psutil
+
     # Using shell command as workaround because there is no Ansible plugin for dnf config-manageer.
     # https://github.com/ansible/ansible/issues/46963
     - name: Add Docker remote repository to dnf.
+      become: yes
       command: dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
 
     - name: Install Docker.
+      become: yes
       dnf:
         name: "{{ packages }}"
         state: latest
@@ -85,10 +97,17 @@
           - core18
           - postman
 
-    # # This neither works nor throws an error, but the commands work when pasted into the terminal. Easy enough to do it manually for now.
-    # - name: Apply GNOME tweaks.
-    #   shell: |
-    #       gsettings set org.gnome.desktop.sound allow-volume-above-100-percent true
-    #       gsettings set org.gnome.desktop.interface clock-show-weekday true
-    #       gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:minimize,maximize,close'
-    #       gsettings set org.gnome.mutter attach-modal-dialogs false
+    - name: Add minimize and maximize buttons to window GUI.
+      community.general.dconf:
+        key: /org/gnome/desktop/wm/preferences/button-layout
+        value: "'appmenu:minimize,maximize,close'"
+
+    - name: Allow system volume above 100%.
+      community.general.dconf:
+        key: /org/gnome/desktop/sound/allow-volume-above-100-percent
+        value: "true"
+
+    - name: Show weekday on system clock.
+      community.general.dconf:
+        key: /org/gnome/desktop/interface/clock-show-weekday
+        value: "true"
