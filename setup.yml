@@ -99,6 +99,8 @@
           - core18
           - postman
 
+
+    # Git configuration.
     - name: Set name for Git user.
       community.general.git_config:
         name: user.name
@@ -111,6 +113,8 @@
         scope: global
         value: "{{ user_email }}"
 
+
+    # System tweaks.
     - name: Add minimize and maximize buttons to window GUI.
       community.general.dconf:
         key: /org/gnome/desktop/wm/preferences/button-layout
