@@ -1,7 +1,9 @@
 - hosts: localhost
   vars:
-    - user: e
     - fedora_version: 37
+    - user: e
+    - user_name: Ethan Meanor
+    - user_email: ethan@meanor.ca
 
   tasks:
     - name: Remove clutter.
@@ -97,6 +99,18 @@
           - core18
           - postman
 
+    - name: Set name for Git user.
+      community.general.git_config:
+        name: user.name
+        scope: global
+        value: "{{ user_name }}"
+
+    - name: Set email for Git user.
+      community.general.git_config:
+        name: user.email
+        scope: global
+        value: "{{ user_email }}"
+
     - name: Add minimize and maximize buttons to window GUI.
       community.general.dconf:
         key: /org/gnome/desktop/wm/preferences/button-layout
@@ -105,6 +119,11 @@
     - name: Allow system volume above 100%.
       community.general.dconf:
         key: /org/gnome/desktop/sound/allow-volume-above-100-percent
+        value: "true"
+
+    - name: Enable Night Light.
+      community.general.dconf:
+        key: /org/gnome/settings-daemon/plugins/color/night-light-enabled
         value: "true"
 
     - name: Show weekday on system clock.
