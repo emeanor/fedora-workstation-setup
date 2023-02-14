@@ -1,7 +1,7 @@
 - hosts: localhost
   vars:
     - fedora_version: 37
-    - user: e
+    - user: ethan
     - user_name: Ethan Meanor
     - user_email: ethan@meanor.ca
 
@@ -83,17 +83,20 @@
           - docker-compose-plugin
 
     - name: Enable snap classic mode.
+      become: yes
       shell: |
         ln -sf /var/lib/snapd/snap /snap
         . /home/{{ user }}/.bashrc
 
     - name: Install VS Code.
+      become: yes
       community.general.snap:
         name:
           - code
         classic: true
 
     - name: Install Postman.
+      become: yes
       community.general.snap:
         name:
           - core18
